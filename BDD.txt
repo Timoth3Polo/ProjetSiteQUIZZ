@@ -1,0 +1,142 @@
+CREATE TABLE eleve (
+	id LONG NOT NULL AUTO_INCREMENT,
+	nom VARCHAR (50) NOT NULL,
+	prenom VARCHAR (50) NOT NULL,
+	mdp VARCHAR (255) NOT NULL,
+	pseudo VARCHAR (100) NOT NULL,
+	dateDeNaissance DATE NOT NULL,
+	telephone INT NOT NULL,
+	mail VARCHAR (100) NOT NULL,
+	PRIMARY KEY (id),
+	UNIQUE (mail, nom, prenom, pseudo, mdp, telephone)
+);
+
+CREATE TABLE professeur (
+	id LONG NOT NULL AUTO_INCREMENT,
+	nom VARCHAR (50) NOT NULL,
+	prenom VARCHAR (50) NOT NULL,
+	mdp VARCHAR (255) NOT NULL,
+	pseudo VARCHAR (100) NOT NULL,
+	dateDeNaissance DATE NOT NULL,
+	telephone INT NOT NULL,
+	mail VARCHAR (100) NOT NULL,
+	PRIMARY KEY (id),
+	UNIQUE (mail, nom, prenom, pseudo, mdp, telephone)
+);
+
+CREATE TABLE professeurPartager (
+	id LONG NOT NULL AUTO_INCREMENT,
+	nom VARCHAR (50) NOT NULL,
+	prenom VARCHAR (50) NOT NULL,
+	mdp VARCHAR (255) NOT NULL,
+	pseudo VARCHAR (100) NOT NULL,
+	dateDeNaissance DATE NOT NULL,
+	telephone INT NOT NULL,
+	mail VARCHAR (100) NOT NULL,
+	PRIMARY KEY (id),
+	UNIQUE (mail, nom, prenom, pseudo, mdp, telephone)
+);
+
+CREATE TABLE groupe (
+	id LONG NOT NULL AUTO_INCREMENT,
+	idChefGroupe LONG NOT NULL,
+	libelle VARCHAR(255) NOT NULL,
+	PRIMARY KEY (id),
+	FOREIGN KEY (idChefGroupe) REFERENCES professeur(id),
+	UNIQUE (libelle)
+);
+
+CREATE TABLE cours (
+	id LONG NOT NULL AUTO_INCREMENT,
+	idChefCours LONG NOT NULL,
+	libelle VARCHAR(255) NOT NULL,
+	PRIMARY KEY (id),
+	FOREIGN KEY (idChefCours) REFERENCES professeur(id),
+	UNIQUE (libelle)
+);	
+
+CREATE TABLE eleveParticiper (
+	id LONG NOT NULL AUTO_INCREMENT,
+	idEleveParticipant LONG NOT NULL,
+	idParticiperGroupe LONG,
+	idParticiperCours LONG NOT NULL,
+	PRIMARY KEY (idAppartenir),
+	FOREIGN KEY (idEleveParticipant) REFERENCES user(id),
+	FOREIGN KEY (idParticiperGroupe) REFERENCES groupe(id),
+	FOREIGN KEY (idParticiperCours) REFERENCES cours(id)
+);
+
+CREATE TABLE groupeAvoirCours (
+	id LONG NOT NULL AUTO_INCREMENT,
+	idCours LONG NOT NULL,
+	idGroupe LONG NOT NULL,
+	PRIMARY KEY (id),
+	FOREIGN KEY (idGroupe) REFERENCES groupe(id),
+	FOREIGN KEY (idCours) REFERENCES cours(id)
+);
+
+CREATE TABLE quizz (
+	id LONG NOT NULL AUTO_INCREMENT,
+	idProfCreateQuizz LONG NOT NULL,
+	date DATE NOT NULL CHECK (DATEDIFF(date, NOW()) >= 0),
+	temps INT NOT NULl CHECK (temps > 0),
+	PRIMARY KEY (id),
+	FOREIGN KEY (idProfCreateQuizz) REFERENCES user(id),
+);
+
+CREATE TABLE participantQuizz (
+	id LONG NOT NULL AUTO_INCREMENT,
+	idGroupeAvoirCours LONG NOT NULL,
+	quizzTerminer TINYINT NOT NULL,
+	idQuizz NOT NULL,
+	PRIMARY KEY (id),
+	FOREIGN KEY (idQuizz) REFERENCES quizz(id),
+	FOREIGN KEY (idGroupeAvoirCours) REFERENCES groupeAvoirCours(id)
+);
+
+CREATE TABLE question (
+	id LONG NOT NULL AUTO_INCREMENT,
+	idProfCreate LONG NOT NULL,
+	laQuestion TEXT NOT NULL CHECK(LENGTH(laQuestion) >= 5),
+	nbPoint FLOAT NOT NULL CHECK(nbPoint > 0),
+	niveau INT NOT NULL CHECK(niveau > 0),
+	PRIMARY KEY (id),
+	FOREIGN KEY (idProfCreate) REFERENCES professeur(id)
+);
+
+CREATE TABLE concerner (
+	id LONG NOT NULL AUTO_INCREMENT,
+	idQuestion LONG NOT NULL,
+	idQuizz LONG NOT NULL,
+	PRIMARY KEY (id),
+	FOREIGN KEY (idQuestion) REFERENCES question(id),
+	FOREIGN KEY (idQuizz) REFERENCES quizz(id)
+);
+
+CREATE TABLE reponse (
+	id LONG NOT NULL AUTO_INCREMENT,
+	idQuestion LONG NOT NULL,
+	laReponse TEXT NOT NULL,
+	PRIMARY KEY (id),
+	FOREIGN KEY (idQuestion) REFERENCES question(id)
+);
+
+CREATE TABLE partagerQuizz (
+	id LONG NOT NULL AUTO_INCREMENT,
+	idDonneAuProf LONG NOT NULL,
+	idQuizzDonner LONG NOT NULL,
+	PRIMARY KEY (id),
+	FOREIGN KEY (idDonneAuProf) REFERENCES professeur(id),
+	FOREIGN KEY (idQuizzDonner) REFERENCES quizz(id)
+);
+
+CREATE TABLE archiveQuizzFaitEleve (
+	id LONG NOT NULL AUTO_INCREMENT,
+	idEleve LONG NOT NULL,
+	idParticipant LONG NOT NULL,
+	PRIMARY KEY (id),
+	FOREIGN KEY (idParticipant) REFERENCES participantQuizz(id),
+	FOREIGN KEY (idEleve) REFERENCES eleve(id)
+);
+
+	
